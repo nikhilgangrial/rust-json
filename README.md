@@ -101,3 +101,21 @@ fn main() {
 {"age": 20, "potatoes": [1, 2, 3, {"b": false, "c": null, "a": 1}]}
 {"age": 21, "potatoes": [1, 2, 3, {"b": false, "c": null, "a": 1}]}
 ```
+
+
+### Data.json
+```json
+{
+    "age": 21,
+    "potatoes": [
+        1,
+        2,
+        3,
+        {
+            "b": false,
+            "c": null,
+            "a": 1
+        }
+    ]
+}
+```
