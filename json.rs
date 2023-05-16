@@ -79,7 +79,7 @@ impl JsonDtype {
                     }
                     s.push_str(&format!("{:indent$}{}", "", item.stringify_pretty(indent + inc, inc), indent = indent+inc))
                 }
-                s.push_str(&format!("{:indent$}]", "", indent = indent));
+                s.push_str(&format!("\n{:indent$}]", "", indent = indent));
                 s
             }
             JsonDtype::Boolean(b) => format!("{}", b),
