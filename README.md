@@ -49,7 +49,7 @@ json_obj.dumps(&mut std::fs::File); // writes stringified json to file
 json_obj.dumps_pretty(&mut std::fs::File); // writes pretty json to file
 ```
 
-### example -
+### Example 
 ```rust
 mod json;
 
