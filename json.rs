@@ -4,7 +4,6 @@ use std::fs::File;
 use std::iter::Peekable;
 use std::hash::{Hash, Hasher};
 use std::io::prelude::*;
-use std::time::Instant;
 
 
 fn skip_whitespaces(json: &mut Peekable<std::str::Chars>) {
@@ -527,17 +526,25 @@ impl fmt::Display for Json {
 }
 
 fn main() {
-    let mut file = File::open("large-file.json").expect("Unable to open the file");
+    let mut json_obj = Json::parse(r#"{"Hello": "World!", "potatoes": [1, 2, 3, { "a": 1 , "b": false, "c": null }],}"#);
+    println!("{}", json_obj);
+    
+    json_obj.insert("age", 20);
+    println!("{}", json_obj.stringify_pretty());
+    
+    println!("{}", json_obj.get("Hello").unwrap());
+    
+    json_obj.remove("Hello");
+    println!("{}", json_obj);
+    
+    let mut json_obj2 = Json::new();
+    json_obj2.insert("age", 21);
 
-    let p = Json::load(&mut file);
+    json_obj.update(json_obj2);
+    println!("{}", json_obj);
 
     let mut data_file = File::create("data.json").expect("creation failed");
 
-    let now = Instant::now();
-
-    p.dumps_pretty(&mut data_file);
-    
-    let elapsed_time = now.elapsed();
-    println!("took {} seconds.", elapsed_time.as_secs());
+    json_obj.dumps_pretty(&mut data_file);
     
 }
