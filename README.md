@@ -3,7 +3,7 @@
 ##### Implementation of json in rust using enums and structs
 
 ### Basic Methods
-```
+```rust
 Json::new(); \\ makes new empty json
 json_obj.insert(key, value); \\ adds key value pair to json
 \\ allowed data types are i128, f64, bool, () for null, string, JsonDtype, Json
@@ -17,30 +17,32 @@ json_obj.clear();
 ```
 
 ### Looping and iteration
-```
+```rust
 json_obj.iter(); \\ return iterable
 json_obj.keys(); \\ return all keys
 ```
 
 ### JsonDtypes
-```
-String  // String
-Number  // i128 or f64
-Object  // Json object
-Array // vector of JsonDtype
-Boolean // true/false
-Null 
+```rust
+enum JsonDtype {
+    String(String)  // String
+    Number(Num)  // i128 or f64
+    Object(Json)  // Json object
+    Array(Vec<JsonDtype>) // vector of JsonDtype
+    Boolean(bool) // true/false
+    Null
+}
 ```
 
 ### Coversion Json/String
-```
+```rust
 Json::parse("{"name": "nikhil"}"); \\ parses json from string
 json_obj.stringify(); \\ return stringified json
 json_obj.stringify_pretty(); \\ returns decorated json (with indentation (4sapces))
 ```
 
 ### save/load to/from file
-```
+```rust
 Json.load(&mut std::fs::File); \\ loads json from file
 json_obj.dump(&mut std::fs::File); \\ writes raw json to file
 json_obj.dumps(&mut std::fs::File); \\ writes stringified json to file
@@ -48,7 +50,7 @@ json_obj.dumps_pretty(&mut std::fs::File); \\ writes pretty json to file
 ```
 
 ### example -
-```
+```rust
 mod json;
 
 json::Json;
@@ -79,7 +81,7 @@ fn main() {
 
 
 ### OUTPUT
-```
+```json
 {"potatoes": [1, 2, 3, {"b": false, "c": null, "a": 1}], "Hello": "World!"}
 {
     "age": 20,
