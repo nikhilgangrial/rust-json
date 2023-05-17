@@ -10,15 +10,18 @@ json_obj.insert(key, value); // adds key value pair to json
 json_obj.get(<key>); // returns value corresponding to the key -> Option<&JsonDtype>
 json_obj.remove(<key>); // removes corresponding value
 json_obj.update(json_obj2); // updates values 
+```
+
+```rust
+json_obj[key]
+json_obj[key] = values;
+```
+
+```rust
 json_obj.contains_key(<key>);
 json_obj.len();
 json_obj.is_empty();
 json_obj.clear();
-```
-
-```
-json_obj[key]
-json_obj[key] = values;
 ```
 
 ### Looping and iteration
