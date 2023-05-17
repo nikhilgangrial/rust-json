@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use std::fmt;
 use std::fs::File;
-use std::iter::Peekable;
 use std::hash::{Hash, Hasher};
 use std::io::prelude::*;
-
+use std::iter::Peekable;
+use std::ops::{Index, IndexMut};
 
 fn skip_whitespaces(json: &mut Peekable<std::str::Chars>) {
     while let Some(&c) = json.peek() {
@@ -32,9 +32,7 @@ impl fmt::Display for Num {
 }
 
 impl Eq for Num {
-    fn assert_receiver_is_total_eq(&self) {
-        
-    }
+    fn assert_receiver_is_total_eq(&self) {}
 }
 
 impl Hash for Num {
@@ -76,7 +74,12 @@ impl JsonDtype {
                     if i > 0 {
                         s.push_str(",\n");
                     }
-                    s.push_str(&format!("{:indent$}{}", "", item.stringify_pretty(indent + inc, inc), indent = indent+inc))
+                    s.push_str(&format!(
+                        "{:indent$}{}",
+                        "",
+                        item.stringify_pretty(indent + inc, inc),
+                        indent = indent + inc
+                    ))
                 }
                 s.push_str(&format!("\n{:indent$}]", "", indent = indent));
                 s
@@ -85,7 +88,6 @@ impl JsonDtype {
             JsonDtype::Null => format!("null"),
         }
     }
-
 }
 
 impl From<String> for JsonDtype {
@@ -160,7 +162,6 @@ impl fmt::Display for JsonDtype {
     }
 }
 
-
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Json {
     map: HashMap<JsonDtype, JsonDtype>,
@@ -177,7 +178,6 @@ impl Hash for Json {
 
 #[allow(dead_code)]
 impl Json {
-
     pub fn new() -> Self {
         Json {
             map: HashMap::new(),
@@ -233,7 +233,7 @@ impl Json {
 
     fn _stringify_pretty(&self, indent: usize, inc: usize) -> String {
         let mut res = String::new();
-        
+
         res.push_str(format!("{}\n", "{").as_str());
 
         for (i, (key, value)) in self.iter().enumerate() {
@@ -242,8 +242,12 @@ impl Json {
             }
             res.push_str(format!("{:indent$}", "", indent = indent + inc).as_str());
             match key {
-                JsonDtype::String(_) => res.push_str(format!("{}: {}", key, value.stringify_pretty(indent+inc, inc)).as_str()),
-                _ => res.push_str(format!("\"{}\": {}", key, value.stringify_pretty(indent+inc, inc)).as_str()),
+                JsonDtype::String(_) => res.push_str(
+                    format!("{}: {}", key, value.stringify_pretty(indent + inc, inc)).as_str(),
+                ),
+                _ => res.push_str(
+                    format!("\"{}\": {}", key, value.stringify_pretty(indent + inc, inc)).as_str(),
+                ),
             }
         }
 
@@ -252,7 +256,6 @@ impl Json {
     }
 
     pub fn parse(json: &str) -> Json {
-
         let mut json = json.chars().peekable();
         skip_whitespaces(&mut json);
 
@@ -271,7 +274,7 @@ impl Json {
 
     fn parse_value(json: &mut Peekable<std::str::Chars>) -> JsonDtype {
         skip_whitespaces(json);
-        
+
         match json.peek() {
             Some(&'"') => Json::parse_string(json),
             Some(&('0'..='9')) => Json::parse_number(json),
@@ -499,16 +502,39 @@ impl Json {
         Json::parse(&contents)
     }
 
-    pub fn dump(&self, file : &mut File) {
-        file.write(self.to_string().as_bytes()).expect("write failed");
-    }
- 
-    pub fn dumps(&self, file : &mut File)  {
-        file.write(self.stringify().as_bytes()).expect("write failed");
+    pub fn dump(&self, file: &mut File) {
+        file.write(self.to_string().as_bytes())
+            .expect("write failed");
     }
 
-    pub fn dumps_pretty(&self, file : &mut File)  {
-        file.write(self.stringify_pretty().as_bytes()).expect("write failed");
+    pub fn dumps(&self, file: &mut File) {
+        file.write(self.stringify().as_bytes())
+            .expect("write failed");
+    }
+
+    pub fn dumps_pretty(&self, file: &mut File) {
+        file.write(self.stringify_pretty().as_bytes())
+            .expect("write failed");
+    }
+}
+
+impl<K> Index<K> for Json
+where
+    K: Into<JsonDtype>,
+{
+    type Output = JsonDtype;
+
+    fn index(&self, index: K) -> &Self::Output {
+        &self.map.index(&index.into())
+    }
+}
+
+impl<K> IndexMut<K> for Json
+where
+    K: Into<JsonDtype>,
+{
+    fn index_mut(&mut self, index: K) -> &mut JsonDtype {
+        self.map.get_mut(&index.into()).unwrap()
     }
 }
 
@@ -526,19 +552,25 @@ impl fmt::Display for Json {
 }
 
 fn main() {
-    let mut json_obj = Json::parse(r#"{"Hello": "World!", "potatoes": [1, 2, 3, { "a": 1 , "b": false, "c": null }],}"#);
+    let mut json_obj = Json::parse(
+        r#"{"Hello": "World!", "potatoes": [1, 2, 3, { "a": 1 , "b": false, "c": null }],}"#,
+    );
     println!("{}", json_obj);
-    
+
     json_obj.insert("age", 20);
     println!("{}", json_obj.stringify_pretty());
-    
+
     println!("{}", json_obj.get("Hello").unwrap());
-    
+
     json_obj.remove("Hello");
     println!("{}", json_obj);
-    
+
     let mut json_obj2 = Json::new();
     json_obj2.insert("age", 21);
+
+    println!("{}", json_obj2["age"]);
+    json_obj2["age"] = 22.into();
+    println!("{}", json_obj2["age"]);
 
     json_obj.update(json_obj2);
     println!("{}", json_obj);
@@ -546,5 +578,4 @@ fn main() {
     let mut data_file = File::create("data.json").expect("creation failed");
 
     json_obj.dumps_pretty(&mut data_file);
-    
 }
