@@ -16,6 +16,11 @@ json_obj.is_empty();
 json_obj.clear();
 ```
 
+```
+json_obj[key]
+json_obj[key] = values;
+```
+
 ### Looping and iteration
 ```rust
 json_obj.iter(); // return iterable
