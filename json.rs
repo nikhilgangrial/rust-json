@@ -69,6 +69,9 @@ impl JsonDtype {
             JsonDtype::Number(n) => format!("{}", n),
             JsonDtype::Object(obj) => format!("{}", obj._stringify_pretty(indent, inc)),
             JsonDtype::Array(arr) => {
+                if arr.len() == 0 {
+                    return "[]".to_string();
+                }
                 let mut s = String::from("[\n");
                 for (i, item) in arr.iter().enumerate() {
                     if i > 0 {
@@ -232,6 +235,11 @@ impl Json {
     }
 
     fn _stringify_pretty(&self, indent: usize, inc: usize) -> String {
+        
+        if self.is_empty() {
+            return "{}".to_string();
+        }
+
         let mut res = String::new();
 
         res.push_str(format!("{}\n", "{").as_str());
@@ -277,7 +285,7 @@ impl Json {
 
         match json.peek() {
             Some(&'"') => Json::parse_string(json),
-            Some(&('0'..='9')) => Json::parse_number(json),
+            Some(&('0'..='9')) | Some(&'-') => Json::parse_number(json),
             Some(&'t') | Some(&'f') => Json::parse_boolean(json),
             Some(&'n') => Json::parse_null(json),
             Some(&'[') => Json::parse_array(json),
@@ -329,16 +337,30 @@ impl Json {
     fn parse_number(json: &mut Peekable<std::str::Chars>) -> JsonDtype {
         let mut number = String::new();
         let mut is_float = false;
+        let mut is_exp = false;
+
+        if json.peek().unwrap() == &'-' {
+            number.push('-');
+            json.next();
+        }
 
         while let Some(&ch) = json.peek() {
             match ch {
                 '.' => {
                     number.push(ch);
-                    if is_float {
-                        panic!("unexpected char found {} expected number", number);
+                    if is_float || is_exp {
+                        panic!("unexpected char found {} expected valid", number);
                     }
                     json.next();
                     is_float = true;
+                }
+                'e' | 'E' => {
+                    if is_exp {
+                        panic!("unexpected char found {} expected valid", number);
+                    }
+                    is_exp = true;
+                    number.push(ch);
+                    json.next();
                 }
                 '0'..='9' => {
                     number.push(ch);
@@ -575,7 +597,7 @@ fn main() {
     json_obj.update(json_obj2);
     println!("{}", json_obj);
 
-    let mut data_file = File::create("data.json").expect("creation failed");
 
+    let mut data_file = File::create("data.json").expect("creation failed");
     json_obj.dumps_pretty(&mut data_file);
 }
