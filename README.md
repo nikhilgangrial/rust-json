@@ -90,31 +90,33 @@ fn main() {
 
 ### OUTPUT
 ```json
-{"potatoes": [1, 2, 3, {"b": false, "c": null, "a": 1}], "Hello": "World!"}
+{"Hello": "World!", "potatoes": [1, 2, 3, {"c": null, "a": 1, "b": false}]}
 {
     "age": 20,
+    "Hello": "World!",
     "potatoes": [
         1,
         2,
         3,
         {
-            "b": false,
             "c": null,
-            "a": 1
+            "a": 1,
+            "b": false
         }
-    ],
-    "Hello": "World!"
+    ]
 }
 "World!"
-{"age": 20, "potatoes": [1, 2, 3, {"b": false, "c": null, "a": 1}]}
-{"age": 21, "potatoes": [1, 2, 3, {"b": false, "c": null, "a": 1}]}
+{"age": 20, "potatoes": [1, 2, 3, {"c": null, "a": 1, "b": false}]}
+21
+22
+{"age": 22, "potatoes": [1, 2, 3, {"c": null, "a": 1, "b": false}]}
 ```
 
 
 ### Data.json
 ```json
 {
-    "age": 21,
+    "age": 22,
     "potatoes": [
         1,
         2,
