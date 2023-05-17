@@ -51,7 +51,7 @@ json_obj.stringify_pretty(); // returns decorated json (with indentation (4sapce
 
 ### save/load to/from file
 ```rust
-Json.load(&mut std::fs::File); // loads json from file
+Json::load(&mut std::fs::File); // loads json from file
 json_obj.dump(&mut std::fs::File); // writes raw json to file
 json_obj.dumps(&mut std::fs::File); // writes stringified json to file
 json_obj.dumps_pretty(&mut std::fs::File); // writes pretty json to file
